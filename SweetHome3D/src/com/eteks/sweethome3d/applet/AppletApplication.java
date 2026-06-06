@@ -39,10 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.ServiceManagerStub;
-import javax.jnlp.UnavailableServiceException;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -155,7 +151,7 @@ public class AppletApplication extends HomeApplication {
       // Unsigned applet
     }
     
-    checkJavaWebStartBasicService(applet, codeBase);          
+    //checkJavaWebStartBasicService(applet, codeBase);
  
     initLookAndFeel();
    
@@ -764,31 +760,6 @@ public class AppletApplication extends HomeApplication {
   }
 
   /**
-   * Checks whether Java Web Start basic service is available to be able to display document from the applet.
-   */
-  private void checkJavaWebStartBasicService(final JApplet applet, URL codeBase) {
-    boolean serviceManagerAvailable = ServiceManager.getServiceNames() != null; 
-    if (serviceManagerAvailable) {
-      try { 
-        ServiceManager.lookup("javax.jnlp.BasicService");
-      } catch (Exception ex) {
-        if ("javax.jnlp.UnavailableServiceException".equals(ex.getClass().getName())) {
-          serviceManagerAvailable = false;
-        } else {
-          throw new RuntimeException(ex);
-        }
-      }
-    }
-
-    if (!serviceManagerAvailable) {
-      // Create JNLP services required by Sweet Home 3D 
-      ServiceManager.setServiceManagerStub(
-          new StandaloneServiceManager(applet.getAppletContext(), codeBase));
-      // Caution: setting a new service manager stub won't replace the existing one
-    }
-  }
-
-  /**
    * A furniture table that renders in italic the name of the imported furniture.
    */
   private static final class AppletFurnitureTable extends FurnitureTable {
@@ -828,62 +799,6 @@ public class AppletApplication extends HomeApplication {
       } else {
         return super.getCellRenderer(row, column);
       }
-    }
-  }
-
-  /**
-   * JNLP <code>ServiceManagerStub</code> implementation for applets 
-   * run out of Java Web Start. This service manager supports <code>BasicService</code> only.
-   */
-  private static class StandaloneServiceManager implements ServiceManagerStub {
-    private BasicService basicService;
-
-    public StandaloneServiceManager(AppletContext appletContext,
-                                    URL codeBase) {
-      this.basicService = new AppletBasicService(appletContext, codeBase);
-    }
-
-    public Object lookup(final String name) throws UnavailableServiceException {
-      if (name.equals("javax.jnlp.BasicService")) {
-        return this.basicService;
-      } else {
-        throw new UnavailableServiceException(name);
-      }
-    }
-    
-    public String[] getServiceNames() {
-      return new String[]  {"javax.jnlp.BasicService"};
-    }
-  }    
-
-  /**
-   * <code>BasicService</code> that displays a web page in the current browser.
-   */
-  private static class AppletBasicService implements BasicService {
-    private final AppletContext appletContext;
-    private final URL    codeBase;
-
-    public AppletBasicService(AppletContext appletContext,
-                              URL codeBase) {
-      this.appletContext = appletContext;
-      this.codeBase = codeBase;
-    }
-
-    public boolean showDocument(URL url) {
-      this.appletContext.showDocument(url);
-      return true;
-    }
-
-    public URL getCodeBase() {
-      return this.codeBase;
-    }
-
-    public boolean isOffline() {
-      return false;
-    }
-
-    public boolean isWebBrowserSupported() {
-      return true;
     }
   }
 }

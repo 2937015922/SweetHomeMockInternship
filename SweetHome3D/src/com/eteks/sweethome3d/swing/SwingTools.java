@@ -19,28 +19,7 @@
  */
 package com.eteks.sweethome3d.swing;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -73,9 +52,6 @@ import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -841,24 +817,19 @@ public class SwingTools {
   public static boolean showDocumentInBrowser(URL url) {
     return BrowserSupport.showDocumentInBrowser(url);
   }
-  
+
   /**
-   * Separated static class to be able to exclude JNLP library from classpath. 
+   * Separated static class to be able to exclude JNLP library from classpath.
    */
   private static class BrowserSupport {
     public static boolean showDocumentInBrowser(URL url) {
-      try { 
-        // Lookup the javax.jnlp.BasicService object 
-        BasicService basicService = (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
-        // Ignore the basic service, if it doesn't support web browser
-        if (basicService.isWebBrowserSupported()) {
-          return basicService.showDocument(url); 
+      try {
+        if (Desktop.isDesktopSupported()) {
+          Desktop.getDesktop().browse(url.toURI());
+          return true;
         }
-      } catch (UnavailableServiceException ex) {
-        // Too bad : service is unavailable
-      } catch (LinkageError ex) {
-        // JNLP classes not available in classpath
-        System.err.println("Can't show document in browser. JNLP classes not available in classpath.");
+      } catch (Exception e) {
+        e.printStackTrace();
       }
       return false;
     }

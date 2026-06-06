@@ -35,17 +35,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,16 +47,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.jnlp.BasicService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.ServiceManagerStub;
-import javax.jnlp.SingleInstanceListener;
-import javax.jnlp.SingleInstanceService;
-import javax.jnlp.UnavailableServiceException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -367,13 +351,14 @@ public class SweetHome3D extends HomeApplication {
    *          following a <code>-open</code> option.
    */
   public static void main(final String [] args) {
+    System.setProperty("com.eteks.sweethome3d.no3D", "true");
     new SweetHome3D().init(args);
   }
 
   /**
    * Inits application instance.
    */
-  protected void init(final String [] args) {
+/**  protected void init(final String [] args) {
     initSystemProperties();
 
     // If Sweet Home 3D is launched from outside of Java Web Start
@@ -493,6 +478,88 @@ public class SweetHome3D extends HomeApplication {
       }
     });
   }
+
+**/
+
+  protected void init(final String [] args) {
+    initSystemProperties();
+
+    // Display splash screen
+    SwingTools.showSplashScreenWindow(
+            SweetHome3D.class.getResource("resources/splashScreen.jpg"));
+
+    // Add a listener that opens a frame when a home is added to application
+    addHomesListener(new CollectionListener<Home>() {
+      private boolean firstApplicationHomeAdded;
+
+      public void collectionChanged(CollectionEvent<Home> ev) {
+        switch (ev.getType()) {
+          case ADD:
+            Home home = ev.getItem();
+            try {
+              HomeFrameController controller = createHomeFrameController(home);
+              controller.displayView();
+
+              if (!this.firstApplicationHomeAdded) {
+                this.firstApplicationHomeAdded = true;
+                addNewHomeCloseListener(home, controller.getHomeController());
+              }
+
+              homeFrameControllers.put(home, controller);
+            } catch (IllegalStateException ex) {
+              if ("javax.media.j3d.IllegalRenderingStateException"
+                      .equals(ex.getClass().getName())) {
+                ex.printStackTrace();
+                exitAfter3DError();
+              } else {
+                throw ex;
+              }
+            }
+            break;
+
+          case DELETE:
+            homeFrameControllers.remove(ev.getItem());
+
+            // Exit when no homes remain (except on macOS)
+            if (getHomes().isEmpty() && !OperatingSystem.isMacOSX()) {
+              EventQueue.invokeLater(() -> System.exit(0));
+            }
+            break;
+        }
+      }
+    });
+
+    addComponent3DRenderingErrorObserver();
+
+    getUserPreferences();
+
+    try {
+      System.setProperty("http.agent",
+              getId() + "/" + getVersion()
+                      + " (" + System.getProperty("os.name")
+                      + " " + System.getProperty("os.version")
+                      + "; " + System.getProperty("os.arch")
+                      + "; " + Locale.getDefault() + ")");
+    } catch (AccessControlException ex) {
+      // Ignore
+    }
+
+    initLookAndFeel();
+
+    try {
+      this.autoRecoveryManager = new AutoRecoveryManager(this);
+    } catch (RecorderException ex) {
+      ex.printStackTrace();
+    }
+
+    if (OperatingSystem.isMacOSX()) {
+      MacOSXConfiguration.bindToApplicationMenu(this);
+    }
+
+    // Start app
+    EventQueue.invokeLater(() -> SweetHome3D.this.start(args));
+  }
+
 
   /**
    * Returns a new instance of a home frame controller after <code>home</code>
@@ -918,217 +985,4 @@ public class SweetHome3D extends HomeApplication {
       }
     }
   }
-  
-  /**
-   * JNLP <code>ServiceManagerStub</code> implementation for standalone
-   * applications run out of Java Web Start. This service manager supports
-   * <code>BasicService</code> and <code>javax.jnlp.SingleInstanceService</code>.
-   * .
-   */
-  private static class StandaloneServiceManager implements ServiceManagerStub {
-    private final Class<? extends SweetHome3D> mainClass;
-
-    public StandaloneServiceManager(Class<? extends SweetHome3D> mainClass) {
-      this.mainClass = mainClass;
-    }
-
-    public Object lookup(final String name) throws UnavailableServiceException {
-      if (name.equals("javax.jnlp.BasicService")) {
-        // Create a basic service that uses Java SE 6 java.awt.Desktop class
-        return new StandaloneBasicService();
-      } else if (name.equals("javax.jnlp.SingleInstanceService")) {
-        // Create a server that waits for further Sweet Home 3D launches
-        return new StandaloneSingleInstanceService(this.mainClass);
-      } else {
-        throw new UnavailableServiceException(name);
-      }
-    }
-
-    public String [] getServiceNames() {
-      return new String [] {"javax.jnlp.BasicService", "javax.jnlp.SingleInstanceService"};
-    }
   }
-
-  /**
-   * <code>BasicService</code> that launches web browser either with Java SE 6
-   * <code>java.awt.Desktop</code> class, or with the <code>open</code> command
-   * under Mac OS X.
-   */
-  private static class StandaloneBasicService implements BasicService {
-    public boolean showDocument(URL url) {
-      try {
-        if (OperatingSystem.isJavaVersionGreaterOrEqual("1.6")) {
-          // Call Java SE 6 java.awt.Desktop browse method by reflection to
-          // ensure Java SE 5 compatibility
-          Class<?> desktopClass = Class.forName("java.awt.Desktop");
-          Object desktopInstance = desktopClass.getMethod("getDesktop").invoke(null);
-          desktopClass.getMethod("browse", URI.class).invoke(desktopInstance, url.toURI());
-          return true;
-        }
-      } catch (Exception ex) {
-        try {
-          if (OperatingSystem.isMacOSX()) {
-            Runtime.getRuntime().exec(new String [] {"open", url.toString()});
-            return true;
-          } else if (OperatingSystem.isLinux()) {
-            Runtime.getRuntime().exec(new String [] {"xdg-open", url.toString()});
-            return true;
-          }  
-        } catch (IOException ex2) {
-        }
-        // For other cases, let's consider simply the showDocument method failed
-      }
-      return false;
-    }
-
-    public URL getCodeBase() {
-      // Return a default URL matching the <code>resources</code> sub directory.
-      return StandaloneServiceManager.class.getResource("resources");
-    }
-
-    public boolean isOffline() {
-      return false;
-    }
-
-    public boolean isWebBrowserSupported() {
-      if (OperatingSystem.isJavaVersionGreaterOrEqual("1.6")) {
-        try {
-          // Call Java SE 6 java.awt.Desktop isSupported(Desktop.Action.BROWSE)
-          // method by reflection to ensure Java SE 5 compatibility
-          Class<?> desktopClass = Class.forName("java.awt.Desktop");
-          Object desktopInstance = desktopClass.getMethod("getDesktop").invoke(null);
-          Class<?> desktopActionClass = Class.forName("java.awt.Desktop$Action");
-          Object desktopBrowseAction = desktopActionClass.getMethod("valueOf", String.class).invoke(null, "BROWSE");
-          if ((Boolean)desktopClass.getMethod("isSupported", desktopActionClass).invoke(desktopInstance,
-              desktopBrowseAction)) {
-            return true;
-          }
-        } catch (Exception ex) {
-          // For any exception, let's consider simply the isSupported method failed
-        }
-      }
-      // For other Java versions, let's support Mac OS X and Linux
-      return OperatingSystem.isMacOSX() || OperatingSystem.isLinux();
-    }
-  }
-
-  /**
-   * A single instance service server that waits for further Sweet Home 3D
-   * launches.
-   */
-  private static class StandaloneSingleInstanceService implements SingleInstanceService {
-    private static final String                SINGLE_INSTANCE_PORT    = "singleInstancePort";
-
-    private final Class<? extends SweetHome3D> mainClass;
-    private final List<SingleInstanceListener> singleInstanceListeners = new ArrayList<SingleInstanceListener>();
-
-    public StandaloneSingleInstanceService(Class<? extends SweetHome3D> mainClass) {
-      this.mainClass = mainClass;
-    }
-
-    public void addSingleInstanceListener(SingleInstanceListener l) {
-      if (this.singleInstanceListeners.isEmpty()) {
-        if (!OperatingSystem.isMacOSX()) {
-          // Launching a server is useless under Mac OS X because further launches will be notified 
-          // by com.apple.eawt.ApplicationListener added to application in MacOSXConfiguration class
-          launchSingleInstanceServer();
-        }
-      }
-      this.singleInstanceListeners.add(l);
-    }
-
-    /**
-     * Launches single instance server.
-     */
-    private void launchSingleInstanceServer() {
-      final ServerSocket serverSocket;
-      try {
-        // Launch a server that waits for other Sweet Home 3D launches
-        serverSocket = new ServerSocket(0, 0, InetAddress.getByName("127.0.0.1"));
-        // Share server port in preferences
-        Preferences preferences = Preferences.userNodeForPackage(this.mainClass);
-        preferences.putInt(SINGLE_INSTANCE_PORT, serverSocket.getLocalPort());
-        preferences.flush();
-      } catch (IOException ex) {
-        // Ignore exception, Sweet Home 3D will work with multiple instances
-        return;
-      } catch (BackingStoreException ex) {
-        // Ignore exception, Sweet Home 3D will work with multiple instances
-        return;
-      }
-
-      Executors.newSingleThreadExecutor().execute(new Runnable() {
-        public void run() {
-          try {
-            while (true) {
-              // Wait client calls
-              Socket socket = serverSocket.accept();
-              // Read client params
-              BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-              String [] params = reader.readLine().split("\t");
-              reader.close();
-              socket.close();
-
-              // Work on a copy of singleInstanceListeners to ensure a listener
-              // can modify safely listeners list
-              SingleInstanceListener [] listeners = singleInstanceListeners
-                  .toArray(new SingleInstanceListener [singleInstanceListeners.size()]);
-              // Call listeners with received params
-              for (SingleInstanceListener listener : listeners) {
-                listener.newActivation(params);
-              }
-            }
-          } catch (IOException ex) {
-            // In case of problem, relaunch server
-            launchSingleInstanceServer();
-          }
-        }
-      });
-    }
-
-    public void removeSingleInstanceListener(SingleInstanceListener l) {
-      this.singleInstanceListeners.remove(l);
-      if (this.singleInstanceListeners.isEmpty()) {
-        Preferences preferences = Preferences.userNodeForPackage(this.mainClass);
-        preferences.remove(SINGLE_INSTANCE_PORT);
-        try {
-          preferences.flush();
-        } catch (BackingStoreException ex) {
-          throw new RuntimeException(ex);
-        }
-      }
-    }
-
-    /**
-     * Returns <code>true</code> if single instance server was successfully
-     * called.
-     */
-    public static boolean callSingleInstanceServer(String [] mainArgs, Class<? extends SweetHome3D> mainClass) {
-      if (!OperatingSystem.isMacOSX()) {
-        // No server under Mac OS X, multiple application launches are managed
-        // by com.apple.eawt.ApplicationListener in MacOSXConfiguration class
-        Preferences preferences = Preferences.userNodeForPackage(mainClass);
-        int singleInstancePort = preferences.getInt(SINGLE_INSTANCE_PORT, -1);
-        if (singleInstancePort != -1) {
-          try {
-            // Try to connect to single instance server
-            Socket socket = new Socket("127.0.0.1", singleInstancePort);
-            // Write main args
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
-            for (String arg : mainArgs) {
-              writer.write(arg);
-              writer.write("\t");
-            }
-            writer.write("\n");
-            writer.close();
-            socket.close();
-            return true;
-          } catch (IOException ex) {
-            // Return false
-          }
-        }
-      }
-      return false;
-    }
-  }
-}
