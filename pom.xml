@@ -128,7 +128,8 @@
         <version>3.6.3</version>
         <configuration>
           <mainClass>com.eteks.sweethome3d.SweetHome3D</mainClass>
-          <classpathScope>runtime</classpathScope>
+          <!-- Include the bundled system-scoped legacy libraries at launch. -->
+          <classpathScope>compile</classpathScope>
         </configuration>
       </plugin>
     </plugins>
