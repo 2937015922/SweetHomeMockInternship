@@ -1,0 +1,13 @@
+# Maven output
+target/
+/SweetHome3D/classes/
+
+# IDE and operating-system metadata
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Sweet Home 3D local state
+*.log
+*.lck
