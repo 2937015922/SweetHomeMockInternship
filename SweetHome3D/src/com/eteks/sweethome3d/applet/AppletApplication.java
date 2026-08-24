@@ -151,8 +151,6 @@ public class AppletApplication extends HomeApplication {
       // Unsigned applet
     }
     
-    //checkJavaWebStartBasicService(applet, codeBase);
- 
     initLookAndFeel();
    
     // Add a listener that changes the content pane of the current active applet 
