@@ -1,5 +1,18 @@
 # Quick start
 
+## Get the repository
+
+1. Fork this repository on GitHub to your own account.
+2. Clone *your fork* (not the course repository):
+
+```sh
+git clone https://github.com/<your-username>/SweetHomeMockInternship.git
+cd SweetHomeMockInternship
+```
+
+Work and commit in your fork for the rest of the internship. Do not push to
+the upstream course repository.
+
 ## Prerequisites
 
 - JDK 11 (recommended; JDK 8 is also supported)
