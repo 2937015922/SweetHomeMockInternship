@@ -6,9 +6,9 @@ not edit `assignment-tests`; these are the public acceptance tests used by
 
 ## Task 1 — Get the application running
 
-Follow [QUICK_START.md](QUICK_START.md), including the build, smoke test, and
-launch commands. The application entry point is
-`SweetHome3D/src/com/eteks/sweethome3d/SweetHome3D.java`.
+Fork this repository on GitHub, then follow [QUICK_START.md](QUICK_START.md),
+including the clone, build, smoke test, and launch commands. The application
+entry point is `SweetHome3D/src/com/eteks/sweethome3d/SweetHome3D.java`.
 
 Acceptance evidence: commit `submissions/task1-running.png`, showing the whole
 application window running on your machine.
@@ -115,4 +115,4 @@ git status --short
 ```
 
 Review `git status`, then commit only your source changes and the required
-evidence files.
+evidence files to your fork.

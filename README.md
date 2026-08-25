@@ -5,6 +5,9 @@ This repository is a small maintenance exercise based on the [Sweet Home 3D](htt
 running, then make three user-facing improvements to furniture editing, the
 furniture table, and printing.
 
+Fork this repository on GitHub, then clone *your fork* and work there.
+Do not clone the course repository directly or push to it.
+
 Start with [QUICK_START.md](QUICK_START.md). The complete requirements,
 reference screenshots, hints, and submission checklist are in
 [ASSIGNMENT.md](ASSIGNMENT.md).
