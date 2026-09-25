@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Sweet Home 3D" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.eteks.sweethome3d.SweetHome3D" />
+    <module name="sweet-home-3d-internship" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

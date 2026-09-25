@@ -15,9 +15,18 @@ the upstream course repository.
 
 ## Prerequisites
 
-- JDK 11 (recommended; JDK 8 is also supported)
-- Maven 3.6 or newer
+- macOS: JDK 8
+- Windows or Linux: JDK 8 or 11 (JDK 11 is recommended)
+- Maven 3.6.3 or newer
 - A graphical desktop for launching the application
+
+Sweet Home 3D 5.4 uses legacy Apple desktop APIs, so use JDK 8 when building
+and running it on macOS. The 3D view is intentionally disabled for this
+exercise.
+
+On an Apple silicon Mac, choose Azul Zulu 8 when downloading the JDK through
+IntelliJ. It may be displayed as version `1.8`; this is Java 8. Temurin does not
+provide Java 8 for this architecture.
 
 Check the tools available on your machine:
 
@@ -26,8 +35,9 @@ java -version
 mvn -version
 ```
 
-Both commands should report the same JDK family. If Maven reports a different
-or newer JDK, set `JAVA_HOME` to a JDK 8 or 11 installation before continuing.
+On macOS, both commands must report Java 8. On Windows and Linux, both should
+report either Java 8 or Java 11. If Maven reports a different JDK, update
+`JAVA_HOME` or Maven's JRE setting in your IDE before continuing.
 
 ## Build and smoke test
 
@@ -53,18 +63,12 @@ From a graphical terminal at the repository root, run:
 mvn compile exec:java
 ```
 
-The 3D panel is intentionally disabled in this exercise, which avoids native
-Java 3D setup on lab machines. A successful launch looks like this:
+A successful launch looks like this:
 
 ![Sweet Home 3D running](images/sweethome.png)
 
-Sweet Home 3D also supports a 3D mode, but it is disabled for this exercise to
-avoid native Java 3D setup on student and lab machines. It is not required or
-assessed, but you may explore it if interested:
-
-![Sweet Home 3D with the 3D view enabled](images/sweethome3d.png)
-
-The bottom-right panel shows the 3D view of the floor plan.
+The empty bottom-right area is expected because the 3D view is disabled and is
+not assessed in this exercise.
 
 Stop the application by closing its window. Then save a screenshot as
 `submissions/task1-running.png`.
@@ -79,19 +83,40 @@ On the starter code, the smoke test passes and the feature tests fail with
 messages for Tasks 2–4. This is expected. Re-run the tests as you work until
 all tests pass.
 
-## IDE setup
+## IntelliJ IDEA setup
 
-Open the repository root as an existing Maven project. IntelliJ IDEA, Eclipse,
-and VS Code should import `pom.xml`; do not configure source folders or JARs by
-hand. If prompted for a project SDK, choose JDK 8 or 11.
+1. Open the repository root and import it as a Maven project. Do not configure
+   source folders or JARs by hand.
+2. Open **File > Project Structure > Project** and choose the project SDK:
+   JDK 8 on macOS, or JDK 8/11 on Windows and Linux. If it is not installed,
+   choose **Add SDK > Download JDK** and download the required version.
+3. Open **Settings > Build, Execution, Deployment > Build Tools > Maven >
+   Runner** and select the same JDK as the runner JRE. Also select it as the
+   Maven importer JDK if your IntelliJ version offers that setting.
+4. Wait for Maven import and indexing to finish.
+5. Select the shared **Sweet Home 3D** run configuration and click Run. You can
+   also open `SweetHome3D.java` and click the green arrow beside `main`.
+
+Tests may be run with the green arrows beside a test class/method or from the
+Maven tool window. If you enable **Delegate IDE build/run actions to Maven**,
+the Maven runner JRE from step 3 is especially important.
+
+The Maven tool window's **Skip Tests** toggle applies to lifecycle goals such
+as `package`. It is not needed to launch the application, and it should be
+turned off before using `mvn test` to check your work.
 
 ## Troubleshooting
 
-- `release version 8 not supported`: Maven is using a JDK older than 8.
-- Compilation errors mentioning APIs removed after Java 11: switch the Maven
-  runtime to JDK 11.
+- `invalid flag: --release`: confirm that `pom.xml` uses version 3.13.0 or
+  newer of `maven-compiler-plugin`, then reload the Maven project.
+- `release version 8 not supported`: Maven is using a JDK older than Java 8.
+- macOS errors mentioning `com.apple.eawt` or `Unimplemented`: the
+  application or Maven is not running with JDK 8.
+- IntelliJ and the terminal behave differently: compare IntelliJ's Project SDK
+  and Maven runner JRE with the JDK reported by `mvn -version`.
 - No window appears: make sure you ran the launch command in a graphical
   session, not a headless SSH session. Use a lab desktop if necessary.
+- The bottom-right area is empty: this is expected because 3D is disabled.
 - Maven cannot download plugins or JUnit: connect to the network once, or run
   on a lab machine with the course Maven cache.
 - To discard only generated build output, run `mvn clean`. It does not remove
