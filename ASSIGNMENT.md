@@ -11,14 +11,19 @@ template to create one issue for each of Tasks 2–4. Link the relevant commits
 and close the issue after its tests and evidence are complete. Using GitHub
 Issues is recommended.
 
+For every task, place acceptance evidence in `submissions/`. Accepted formats
+are PNG, JPG, JPEG, and PDF. The filename must contain the corresponding task
+number (`task1`, `task2`, `task3`, or `task4`). Suggested filenames appear
+below.
+
 ## Task 1 — Get the application running
 
 Fork this repository on GitHub, then follow [QUICK_START.md](QUICK_START.md),
 including the clone, build, smoke test, and launch commands. The application
 entry point is `SweetHome3D/src/com/eteks/sweethome3d/SweetHome3D.java`.
 
-Acceptance evidence: commit `submissions/task1-running.png`, showing the whole
-application window running on your machine.
+Acceptance evidence must show the whole application window running on your
+machine. Suggested filename: `submissions/task1-running.png`.
 
 ## Task 2 — Make furniture descriptions editable
 
@@ -34,9 +39,9 @@ The controller already handles saving the value. Look for the method that tells
 the view whether each furniture property is editable; the implementation is a
 small change, but update any now-inaccurate documentation near it too.
 
-Acceptance evidence: commit `submissions/task2-description.png`, showing an
-edited description in the dialog. The public test checks that DESCRIPTION is
-reported as editable.
+Acceptance evidence must show an edited description in the dialog. Suggested
+filename: `submissions/task2-description.png`. The public test checks that
+DESCRIPTION is reported as editable.
 
 ## Task 3 — Add a Volume column
 
@@ -72,9 +77,10 @@ Height. Searching for an existing sortable property across model, controller,
 view, table renderer, and English resource files is a useful way to understand
 that path.
 
-Acceptance evidence: commit `submissions/task3-volume.png`, showing the Volume
-column populated and one of its sort/display menus. Public tests check the
-calculation, comparator, default column, table header, and menu action types.
+Acceptance evidence must show the Volume column populated and one of its
+sort/display menus. Suggested filename: `submissions/task3-volume.png`. Public
+tests check the calculation, comparator, default column, table header, and menu
+action types.
 
 ## Task 4 — Print every level
 
@@ -105,11 +111,11 @@ Useful places to investigate:
 - `Home` can change its selected level. Treat that as temporary state and
   restore it reliably.
 
-Acceptance evidence: commit either `submissions/task4-all-levels.png` showing
-the print-preview page count/thumbnails, or
-`submissions/task4-all-levels.pdf` containing the output. The public test checks
-that each plan page exists and that the selected level is restored. The
-furniture-table content and visual output are checked manually.
+Acceptance evidence must show the print-preview page count/thumbnails or contain
+the printed output. Suggested filenames: `submissions/task4-all-levels.png` or
+`submissions/task4-all-levels.pdf`. The public test checks that each plan page
+exists and that the selected level is restored. The furniture-table content and
+visual output are checked manually.
 
 ## Final checklist
 
