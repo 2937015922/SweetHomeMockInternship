@@ -25,7 +25,8 @@ and running it on macOS. The 3D view is intentionally disabled for this
 exercise.
 
 On an Apple silicon Mac, choose Azul Zulu 8 when downloading the JDK through
-IntelliJ. Temurin does not provide Java 8 for this architecture.
+IntelliJ. It may be displayed as version `1.8`; this is Java 8. Temurin does not
+provide Java 8 for this architecture.
 
 Check the tools available on your machine:
 
