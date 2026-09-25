@@ -24,6 +24,9 @@ Sweet Home 3D 5.4 uses legacy Apple desktop APIs, so use JDK 8 when building
 and running it on macOS. The 3D view is intentionally disabled for this
 exercise.
 
+On an Apple silicon Mac, choose Azul Zulu 8 when downloading the JDK through
+IntelliJ. Temurin does not provide Java 8 for this architecture.
+
 Check the tools available on your machine:
 
 ```sh
