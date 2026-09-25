@@ -4,6 +4,13 @@ Work through the tasks in order. English-only UI updates are sufficient. Do
 not edit `assignment-tests`; these are the public acceptance tests used by
 `mvn test` and may be supplemented by hidden tests during grading.
 
+For a more realistic maintenance workflow, enable Issues in your fork: open
+**[Settings](../../settings)**, find **Features**, and select **Issues**. Then use
+the included **[Internship task](../../issues/new?template=internship-task.md)**
+template to create one issue for each of Tasks 2–4. Link the relevant commits
+and close the issue after its tests and evidence are complete. Using GitHub
+Issues is recommended.
+
 ## Task 1 — Get the application running
 
 Fork this repository on GitHub, then follow [QUICK_START.md](QUICK_START.md),

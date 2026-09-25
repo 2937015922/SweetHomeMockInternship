@@ -12,6 +12,18 @@ Start with [QUICK_START.md](QUICK_START.md). The complete requirements,
 reference screenshots, hints, and submission checklist are in
 [ASSIGNMENT.md](ASSIGNMENT.md).
 
+## Internship workflow
+
+Treat Tasks 2–4 as small maintenance tickets: understand the request, make a
+focused change, verify it, and commit the result. GitHub does not copy issues
+from an upstream repository into a fork, so you may enable Issues in your fork
+by opening **[Settings](../../settings)**, finding **Features**, and selecting
+**Issues**. Then create one issue for each feature using the included
+**[Internship task](../../issues/new?template=internship-task.md)** template.
+Close each issue when its tests and acceptance evidence are complete.
+
+Using GitHub Issues is recommended.
+
 ## Repository map
 
 - `SweetHome3D/src` — Java application source and resources
