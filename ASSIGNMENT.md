@@ -41,6 +41,16 @@ Treat their suggestions as suggestions, not as authoritative answers.
 You are responsible for understanding, testing, and being able to explain
 any code you submit. Do not submit code that you do not understand.
 
+## Working through the internship
+
+As with joining any established project, you aren't expected to understand
+the whole codebase at once. The tasks increase in scope as you go,
+but you should also become more comfortable navigating the project and
+tracing how existing features work. By the later tasks, you'll need to
+investigate multiple parts of the application and determine how they work together.
+
+You do not need to understand the *entire* application before making useful changes to it.
+
 ## Task 1 — Get the application running
 
 Your first task is to get the existing application running on your machine.
