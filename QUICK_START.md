@@ -107,8 +107,10 @@ turned off before using `mvn test` to check your work.
 - `invalid flag: --release`: confirm that `pom.xml` uses version 3.13.0 or
   newer of `maven-compiler-plugin`, then reload the Maven project.
 - `release version 8 not supported`: Maven is using a JDK older than Java 8.
-- macOS errors mentioning `com.apple.eawt` or `Unimplemented`: the
-  application or Maven is not running with JDK 8.
+- macOS errors mentioning `com.apple.eawt` or `Unimplemented`: first confirm
+  that `mvn -version` reports Java 8. If it does, sync your fork with the
+  latest assignment repository; older copies may launch Maven with the
+  bundled Apple API stubs instead of the macOS JDK classes.
 - IntelliJ and the terminal behave differently: compare IntelliJ's Project SDK
   and Maven runner JRE with the JDK reported by `mvn -version`.
 - No window appears: make sure you ran the launch command in a graphical

@@ -130,6 +130,11 @@
           <mainClass>com.eteks.sweethome3d.SweetHome3D</mainClass>
           <!-- Include the bundled system-scoped legacy libraries at launch. -->
           <classpathScope>compile</classpathScope>
+          <!-- On macOS Java 8, use the JDK's real Apple APIs instead of the
+               compile-time stubs in AppleJavaExtensions.jar. -->
+          <forcedJvmPackages>
+            <forcedJvmPackage>com.apple.</forcedJvmPackage>
+          </forcedJvmPackages>
         </configuration>
       </plugin>
     </plugins>
